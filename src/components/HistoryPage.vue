@@ -62,6 +62,11 @@ import axios from 'axios'
 
 export default {
     name: 'history-page',
+    metaInfo() {
+        return {
+            title: this.$i18n.t('menu.history'),
+        }
+    },
     data() {
         return {
             days: [],

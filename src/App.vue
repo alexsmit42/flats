@@ -42,9 +42,23 @@ import 'firebase/auth'
 
 export default {
     name: 'app',
+    metaInfo() {
+        return {
+            titleTemplate: `%s | ` + this.$i18n.t('app'),
+        }
+    },
     data () {
         return {
             locales: ['en', 'ru', 'pl']
+        }
+    },
+    mounted() {
+        let storageLocale = localStorage.getItem('locale')
+
+        if (!storageLocale) {
+            localStorage.setItem('locale', this.$i18n.locale)
+        } else {
+            this.$i18n.locale = storageLocale
         }
     },
     computed: {
@@ -64,6 +78,7 @@ export default {
     methods: {
         changeLocale(locale) {
             if (locale !== this.currentLocale) {
+                localStorage.setItem('locale', locale)
                 this.$i18n.locale = locale
             }
         },

@@ -1,7 +1,7 @@
 var path = require('path')
 var webpack = require('webpack')
 
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const CompressionPlugin = require('compression-webpack-plugin')
 
 module.exports = {
@@ -66,7 +66,7 @@ module.exports = {
         exclude: /node_modules/
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
+        test: /\.(png|jpg|gif|svg|ico)$/,
         loader: 'file-loader',
         options: {
           name: '[name].[ext]?[hash]'
@@ -89,7 +89,7 @@ module.exports = {
     hints: false
   },
   plugins: [
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new CompressionPlugin({
       test: /\.js/

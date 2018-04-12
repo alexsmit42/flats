@@ -65,4 +65,11 @@ router.get('/favorites/flats', (req, res) => {
     })()
 })
 
+router.post('/excel', (req, res) => {
+    let flats = req.body.flats
+    if (api.saveExcel(flats)) {
+        res.json({success: true})
+    }
+})
+
 module.exports = router;

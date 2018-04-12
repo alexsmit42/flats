@@ -4,7 +4,11 @@
 
 <script>
 export default {
-  
+    metaInfo() {
+        return {
+            title: this.$i18n.t('menu.admin'),
+        }
+    },
 }
 </script>
 

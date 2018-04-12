@@ -1,0 +1,6 @@
+{
+    "mongo": {
+        "host": "mongodb://localhost",
+        "db": "flats"
+    }
+}

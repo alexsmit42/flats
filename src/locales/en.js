@@ -1,5 +1,7 @@
 module.exports = {
+    app: 'Polish flats app',
     back: 'Back',
+    saveExcel: 'Save to Excel',
     auth: {
         email: 'Email',
         login: 'Login',

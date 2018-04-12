@@ -1,43 +1,47 @@
 <template lang="pug">
-table.flats-list.table.table-sm.table-striped(v-if="flats.length")
-    thead
-        tr
-            th.title {{ $t('flats.title') }}
-            th.rooms {{ $t('flats.rooms') }}
-            th.order(@click="changeOrder('price')") {{ $t('flats.price') }}, zł
-                span.direction
-                    i.fa.fa-angle-up(v-if="order.field === 'price' && order.asc")
-                    i.fa.fa-angle-down(v-if="order.field === 'price' && !order.asc")
-            th.order(@click="changeOrder('area')") {{ $t('flats.area') }}, {{ $t('flats.m') }}
-                sup 2
-                span.direction
-                    i.fa.fa-angle-up(v-if="order.field === 'area' && order.asc")
-                    i.fa.fa-angle-down(v-if="order.field === 'area' && !order.asc")
-            th.order(@click="changeOrder('meter')") {{ $t('flats.meter') }}, zł/{{ $t('flats.m') }}
-                sup 2
-                span.direction
-                    i.fa.fa-angle-up(v-if="order.field === 'meter' && order.asc")
-                    i.fa.fa-angle-down(v-if="order.field === 'meter' && !order.asc")
-            th.order(@click="changeOrder('days')") {{ $t('flats.daysAgo') }}
-                span.direction
-                    i.fa.fa-angle-up(v-if="order.field === 'days' && order.asc")
-                    i.fa.fa-angle-down(v-if="order.field === 'days' && !order.asc")
-    tbody
-        tr(v-for="flat in flats")
-            td.title
-                i.fa.fa-star(
-                    v-if="user",
-                    :class="{'is-fav': favorites.indexOf(flat.siteID) !== -1}", 
-                    :title="favorites.indexOf(flat.siteID) !== -1 ? $i18n.t('favorites.remove') : $i18n.t('favorites.add')", 
-                    @click="favoriteClick(flat.siteID)"
-                )
-                a(:href="flat.url", target="_blank") {{ flat.title }}
-            td {{ flat.rooms }}
-            td(:class="{ordered: order.field === 'price'}") {{ flat.price }} 
-            td(:class="{ordered: order.field === 'area'}") {{ flat.area }} 
-            td(:class="{ordered: order.field === 'meter'}") {{ flat.meter }} 
-            td(:class="{ordered: order.field === 'days'}") {{ flat.days}}
-                span.price-change-warning(v-if="flat.uniquePrices.length > 1") ({{ $t('flats.changedPrice') }}!)  
+.flats-list
+    .save-excel
+        a(href="#", @click="saveExcel") {{ $t('saveExcel') }}
+
+    table.table.table-sm.table-striped(v-if="flats.length")
+        thead
+            tr
+                th.title {{ $t('flats.title') }}
+                th.rooms {{ $t('flats.rooms') }}
+                th.order(@click="changeOrder('price')") {{ $t('flats.price') }}, zł
+                    span.direction
+                        i.fa.fa-angle-up(v-if="order.field === 'price' && order.asc")
+                        i.fa.fa-angle-down(v-if="order.field === 'price' && !order.asc")
+                th.order(@click="changeOrder('area')") {{ $t('flats.area') }}, {{ $t('flats.m') }}
+                    sup 2
+                    span.direction
+                        i.fa.fa-angle-up(v-if="order.field === 'area' && order.asc")
+                        i.fa.fa-angle-down(v-if="order.field === 'area' && !order.asc")
+                th.order(@click="changeOrder('meter')") {{ $t('flats.meter') }}, zł/{{ $t('flats.m') }}
+                    sup 2
+                    span.direction
+                        i.fa.fa-angle-up(v-if="order.field === 'meter' && order.asc")
+                        i.fa.fa-angle-down(v-if="order.field === 'meter' && !order.asc")
+                th.order(@click="changeOrder('days')") {{ $t('flats.daysAgo') }}
+                    span.direction
+                        i.fa.fa-angle-up(v-if="order.field === 'days' && order.asc")
+                        i.fa.fa-angle-down(v-if="order.field === 'days' && !order.asc")
+        tbody
+            tr(v-for="flat in flats")
+                td.title
+                    i.fa.fa-star(
+                        v-if="user",
+                        :class="{'is-fav': favorites.indexOf(flat.siteID) !== -1}", 
+                        :title="favorites.indexOf(flat.siteID) !== -1 ? $i18n.t('favorites.remove') : $i18n.t('favorites.add')", 
+                        @click="favoriteClick(flat.siteID)"
+                    )
+                    a(:href="flat.url", target="_blank") {{ flat.title }}
+                td {{ flat.rooms }}
+                td(:class="{ordered: order.field === 'price'}") {{ flat.price }} 
+                td(:class="{ordered: order.field === 'area'}") {{ flat.area }} 
+                td(:class="{ordered: order.field === 'meter'}") {{ flat.meter }} 
+                td(:class="{ordered: order.field === 'days'}") {{ flat.days}}
+                    span.price-change-warning(v-if="flat.uniquePrices.length > 1") ({{ $t('flats.changedPrice') }}!)  
 </template>
 
 <script>
@@ -96,61 +100,76 @@ export default {
                 this.favorites = res.data.favorites
                 this.$forceUpdate()
             })
-        }
+        },
+        saveExcel() {
+            axios.post('/api/excel', {flats: this.flats}).then(res => {
+                if (res.data.success === true) {
+                    var win = window.open('/download', '_blank');
+                    // win.focus();
+                }
+            })
+        },
     }
 }
 </script>
 
 <style lang="scss">
 .flats-list {
-    .title {
-        text-align: left;
+
+    .save-excel {
+        margin: 20px auto;
     }
 
-    th {
-        &.rooms {
-            width: 100px;
+    table {
+        .title {
+            text-align: left;
         }
 
-        &.order {
-            width: 200px;
-        }
+        th {
+            &.rooms {
+                width: 100px;
+            }
 
-        .direction {
-            width: 30px;
+            &.order {
+                width: 200px;
+            }
 
-            i {
-                margin-left: 5px;
-                font-size: 110%;
+            .direction {
+                width: 30px;
+
+                i {
+                    margin-left: 5px;
+                    font-size: 110%;
+                }
             }
         }
-    }
 
-    td {
-        .fa-star {
-            margin-right: 5px;
-            color: silver;
+        td {
+            .fa-star {
+                margin-right: 5px;
+                color: silver;
+                cursor: pointer;
+
+                &.is-fav {
+                    color: goldenrod;
+                }
+            }
+
+            &.ordered {
+                background-color: #d3f7d3;
+                border-left: 1px solid green;
+                border-right: 1px solid green;
+            }
+        }
+
+        .order {
+            color: darkblue;
             cursor: pointer;
-
-            &.is-fav {
-                color: goldenrod;
-            }
         }
 
-        &.ordered {
-            background-color: #d3f7d3;
-            border-left: 1px solid green;
-            border-right: 1px solid green;
+        .price-change-warning {
+            color: red;
         }
-    }
-
-    .order {
-        color: darkblue;
-        cursor: pointer;
-    }
-
-    .price-change-warning {
-        color: red;
     }
 }
 </style>

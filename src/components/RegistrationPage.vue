@@ -25,6 +25,11 @@ import 'firebase/auth'
 
 export default {
     name: 'registration-page',
+    metaInfo() {
+        return {
+            title: this.$i18n.t('auth.registration'),
+        }
+    },
     data() {
         return {
             email: '',

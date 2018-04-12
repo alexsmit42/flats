@@ -1,4 +1,4 @@
 let Flat = require('./flat');
-let User = require('./user');
+let District = require('./district');
 
-module.exports = {Flat, User};
+module.exports = {Flat, District};

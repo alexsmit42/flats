@@ -1,5 +1,7 @@
 module.exports = {
+    app: 'Аренда квартир в Польше',
     back: 'Назад',
+    saveExcel: 'Сохранить в Excel',
     auth: {
         email: 'Email',
         login: 'Войти',

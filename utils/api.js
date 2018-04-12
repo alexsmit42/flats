@@ -4,6 +4,8 @@ let redis = require('./redis')
 
 let parser = require('./parser')
 
+let xlsx = require('xlsx')
+
 let api = {
     parseFlats: async () => {
         let flats = await parser.getFlats('https://www.morizon.pl/do-wynajecia/mieszkania/wroclaw/krzyki/?ps%5Bnumber_of_rooms_from%5D=1&ps%5Bnumber_of_rooms_to%5D=2')
@@ -169,6 +171,44 @@ let api = {
         let favorites = await redis.getFavorites(userID)
         return favorites
     },
+
+    saveExcel(flats) {
+        let filename = './files/flats.xlsx'
+        let wsName = 'Flats'
+
+        let titles = ['title', 'rooms', 'price, zł', 'area, m²', 'meter, zł/m²']
+        let data = flats.map(flat => {
+            return [flat.title, flat.rooms, flat.price, flat.area, flat.meter]
+        })
+
+        data.unshift(titles)
+
+        let wb = xlsx.utils.book_new()
+        let ws = xlsx.utils.aoa_to_sheet(data)
+        
+        for (let i in ws) {
+            let index = parseInt(i.slice(1))
+
+            // if (index === 1) {
+            //     ws[i]['s'] = {
+            //         font: {bold: true, name: 'Arial'},
+            //         alignment: {horizontal: 'center'}
+            //     }
+            // }
+
+            if (i[0] === 'A' && index !== 1) {
+                ws[i]['l'] = {
+                    Target: flats[index - 2].url,
+                    Tooltip: flats[index - 2].title
+                }
+            }
+        }
+
+        xlsx.utils.book_append_sheet(wb, ws, wsName)
+        xlsx.writeFile(wb, filename)
+
+        return true
+    }
 }
 
 module.exports = api;

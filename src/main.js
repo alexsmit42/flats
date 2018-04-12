@@ -9,14 +9,8 @@ Vue.use(VueI18n)
 import Firebase from 'firebase/app'
 import 'firebase/auth'
 
-Firebase.initializeApp({
-  apiKey: 'AIzaSyBmgSGpSGbfaRwByySTXJHIbI00fBRCo80',
-  authDomain: 'flats-c3f88.firebaseapp.com',
-  databaseURL: 'https://flats-c3f88.firebaseio.com',
-  projectId: 'flats-c3f88',
-  storageBucket: 'flats-c3f88.appspot.com',
-  messagingSenderId: '704028153692'
-});
+import FirebaseConfig from './firebase'
+Firebase.initializeApp(FirebaseConfig);
 
 import App from './App.vue'
 
@@ -45,26 +39,7 @@ const store = new Vuex.Store({
 
 // Routes
 
-import {routes} from './routes'
-const router = new VueRouter({
-  routes,
-  linkActiveClass: 'active'
-})
-
-router.beforeEach((to, from, next) => {
-  const currentUser = Firebase.auth().currentUser;
-
-  let isRequiredAuth = to.matched.some(record => {
-    return record.meta.isRequiredAuth
-  })
-
-  if (isRequiredAuth && !currentUser) {
-    next('/login')
-  } else {
-    next()
-  }
-})
-
+import router from './router'
 
 // Locales
 

@@ -26,6 +26,11 @@ import 'firebase/auth'
 
 export default {
     name: 'login-page',
+    metaInfo() {
+        return {
+            title: this.$i18n.t('auth.login'),
+        }
+    },
     data() {
         return {
             email: '',

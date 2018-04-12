@@ -3,6 +3,7 @@
 .vscode
 dist
 dump
+files
 logs
 node_modules
 

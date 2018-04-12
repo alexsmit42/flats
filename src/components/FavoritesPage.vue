@@ -11,6 +11,12 @@ import axios from 'axios'
 import FlatsList from './partial/FlatsList.vue'
 
 export default {
+    name: 'favorites-page',
+    metaInfo() {
+        return {
+            title: this.$i18n.t('menu.favorites'),
+        }
+    },
     data() {
         return {
             favorites: [],

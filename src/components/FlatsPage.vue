@@ -60,6 +60,11 @@ import PaginationBlock from './partial/PaginationBlock.vue'
 
 export default {
     name: 'flats-page',
+    metaInfo() {
+        return {
+            title: this.$i18n.t('menu.flats'),
+        }
+    },
     data() {
         return {
             day: '',
@@ -99,23 +104,15 @@ export default {
         }
     },
     methods: {
-        getFlats() {
-            if (Object.keys(this.$store.state.flats).length) {
-                this.flats = this.$store.state.flats
-                this.day = this.$store.state.lastDay
-                this.$forceUpdate
+        changeOrder(field) {
+            if (this.order.field === field) {
+                this.order.asc = !this.order.asc
             } else {
-                axios.get('/api/flats', {}).then(res => {
-                    this.day = res.data.lastDay
-                    this.flats = res.data.flats
-
-                    this.$store.commit('updateFlats', res.data)
-                    this.$forceUpdate
-                })
+                this.order.asc = true
             }
-        },
-        goPage(page) {
-            this.page = page
+            this.order.field = field;
+
+            this.$forceUpdate()
         },
         filterFlats() {
             let flats = this.flats.slice(0)
@@ -152,15 +149,23 @@ export default {
 
             return flats
         },
-        changeOrder(field) {
-            if (this.order.field === field) {
-                this.order.asc = !this.order.asc
+        getFlats() {
+            if (Object.keys(this.$store.state.flats).length) {
+                this.flats = this.$store.state.flats
+                this.day = this.$store.state.lastDay
+                this.$forceUpdate
             } else {
-                this.order.asc = true
-            }
-            this.order.field = field;
+                axios.get('/api/flats', {}).then(res => {
+                    this.day = res.data.lastDay
+                    this.flats = res.data.flats
 
-            this.$forceUpdate()
+                    this.$store.commit('updateFlats', res.data)
+                    this.$forceUpdate
+                })
+            }
+        },
+        goPage(page) {
+            this.page = page
         },
         sortBy(data, order) {
             function compare(a, b) {
