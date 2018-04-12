@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
+import VueI18n from 'vue-i18n'
 Vue.use(Vuex)
 Vue.use(VueRouter)
+Vue.use(VueI18n)
 
 import Firebase from 'firebase/app'
 import 'firebase/auth'
@@ -20,6 +22,9 @@ import App from './App.vue'
 
 Vue.config.devtools = true
 
+
+// Store
+
 const store = new Vuex.Store({
   state: {
     days: {},
@@ -36,6 +41,9 @@ const store = new Vuex.Store({
     }
   }
 })
+
+
+// Routes
 
 import {routes} from './routes'
 const router = new VueRouter({
@@ -57,12 +65,22 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+
+// Locales
+
+const localeMessages = require('./locales/')
+const i18n = new VueI18n({
+  locale: 'en',
+  messages: localeMessages
+})
+
+
 Firebase.auth().onAuthStateChanged( () => {
   new Vue({
     el: '#app',
     store,
     router,
-    Firebase,
+    i18n,
     render: h => h(App)
   })
 });

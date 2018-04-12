@@ -40,7 +40,9 @@ export default {
 </script>
 
 <style lang="scss">
-
+.favorites-page {
+    margin: 20px;
+}
 </style>
 
 

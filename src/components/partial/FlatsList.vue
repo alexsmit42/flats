@@ -2,23 +2,23 @@
 table.flats-list.table.table-sm.table-striped(v-if="flats.length")
     thead
         tr
-            th.title Title
-            th.rooms Rooms
-            th.order(@click="changeOrder('price')") Price, zł
+            th.title {{ $t('flats.title') }}
+            th.rooms {{ $t('flats.rooms') }}
+            th.order(@click="changeOrder('price')") {{ $t('flats.price') }}, zł
                 span.direction
                     i.fa.fa-angle-up(v-if="order.field === 'price' && order.asc")
                     i.fa.fa-angle-down(v-if="order.field === 'price' && !order.asc")
-            th.order(@click="changeOrder('area')") Area, m
+            th.order(@click="changeOrder('area')") {{ $t('flats.area') }}, {{ $t('flats.m') }}
                 sup 2
                 span.direction
                     i.fa.fa-angle-up(v-if="order.field === 'area' && order.asc")
                     i.fa.fa-angle-down(v-if="order.field === 'area' && !order.asc")
-            th.order(@click="changeOrder('meter')") Meter, zł/m
+            th.order(@click="changeOrder('meter')") {{ $t('flats.meter') }}, zł/{{ $t('flats.m') }}
                 sup 2
                 span.direction
                     i.fa.fa-angle-up(v-if="order.field === 'meter' && order.asc")
                     i.fa.fa-angle-down(v-if="order.field === 'meter' && !order.asc")
-            th.order(@click="changeOrder('days')") Days ago
+            th.order(@click="changeOrder('days')") {{ $t('flats.daysAgo') }}
                 span.direction
                     i.fa.fa-angle-up(v-if="order.field === 'days' && order.asc")
                     i.fa.fa-angle-down(v-if="order.field === 'days' && !order.asc")
@@ -26,8 +26,9 @@ table.flats-list.table.table-sm.table-striped(v-if="flats.length")
         tr(v-for="flat in flats")
             td.title
                 i.fa.fa-star(
+                    v-if="user",
                     :class="{'is-fav': favorites.indexOf(flat.siteID) !== -1}", 
-                    :title="favorites.indexOf(flat.siteID) !== -1 ? 'Remove from favorites' : 'Add to favorites'", 
+                    :title="favorites.indexOf(flat.siteID) !== -1 ? $i18n.t('favorites.remove') : $i18n.t('favorites.add')", 
                     @click="favoriteClick(flat.siteID)"
                 )
                 a(:href="flat.url", target="_blank") {{ flat.title }}
@@ -36,7 +37,7 @@ table.flats-list.table.table-sm.table-striped(v-if="flats.length")
             td(:class="{ordered: order.field === 'area'}") {{ flat.area }} 
             td(:class="{ordered: order.field === 'meter'}") {{ flat.meter }} 
             td(:class="{ordered: order.field === 'days'}") {{ flat.days}}
-                span.price-change-warning(v-if="flat.uniquePrices.length > 1") (price was changed!)  
+                span.price-change-warning(v-if="flat.uniquePrices.length > 1") ({{ $t('flats.changedPrice') }}!)  
 </template>
 
 <script>

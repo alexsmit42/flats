@@ -1,8 +1,10 @@
 .history
 .idea
 .vscode
+dist
 dump
 logs
 node_modules
 
+.editorconfig
 search.js

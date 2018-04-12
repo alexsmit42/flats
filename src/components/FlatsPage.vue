@@ -2,49 +2,49 @@
 .flats-page
     h4 {{ day }}
 
-    .total-line(v-if="total") Total: {{ total }}
+    .total-line(v-if="total") {{ $t('flats.total') }}: {{ total }}
 
     .filter-block.form-inline(v-if="flats.length")
         .filter-item
-            span.label Rooms:
+            span.label {{ $t('flats.rooms') }}:
             span.filter
                 select.form-control(v-model="filters.rooms")
-                    option(value="0") All
-                    option(value="1") 1-room
-                    option(value="2") 2-room
+                    option(value="0") {{ $t('flats.all') }}
+                    option(value="1") {{ $t('flats.oneRoom') }}
+                    option(value="2") {{ $t('flats.twoRoom') }}
         .filter-item
-            span.label Price:
+            span.label {{ $t('flats.price') }}:
             span.filter
-                input.form-control(v-model="filters.minPrice", type="text", maxlength="5", placeholder="From, zł") 
+                input.form-control(v-model="filters.minPrice", type="text", maxlength="5", :placeholder="$i18n.t('flats.from') + ' zł'") 
                 span.separator -
-                input.form-control(v-model="filters.maxPrice", type="text", maxlength="5", placeholder="To, zł")
+                input.form-control(v-model="filters.maxPrice", type="text", maxlength="5", :placeholder="$i18n.t('flats.to') + ' zł'")
         .filter-item
-            span.label Area:
+            span.label {{ $t('flats.area') }}:
             span.filter
-                input.form-control(v-model="filters.minArea", type="text", maxlength="3", placeholder="From, m2") 
+                input.form-control(v-model="filters.minArea", type="text", maxlength="3", :placeholder="$i18n.t('flats.from') + ', m2'") 
                 span.separator -
-                input.form-control(v-model="filters.maxArea", type="text", maxlength="3", placeholder="To, m2")
+                input.form-control(v-model="filters.maxArea", type="text", maxlength="3", :placeholder="$i18n.t('flats.to') + ', m2'")
         .filter-item
-            span.label Days:
+            span.label {{ $t('flats.days') }}:
             span.filter
                 select.form-control(v-model="filters.days")
-                    option(value="0") All
-                    option(value="1") up to 1 day
-                    option(value="2") up to 2 days
-                    option(value="3") up to 3 days
-                    option(value="4") up to 4 days
-                    option(value="5") up to 5 days
-                    option(value="6") up to 6 days
-                    option(value="7") up to 7 days
+                    option(value="0") {{ $t('flats.all') }}
+                    option(value="1") {{ $t('flats.upTo._1') }}
+                    option(value="2") {{ $t('flats.upTo._2') }}
+                    option(value="3") {{ $t('flats.upTo._3') }}
+                    option(value="4") {{ $t('flats.upTo._4') }}
+                    option(value="5") {{ $t('flats.upTo._5') }}
+                    option(value="6") {{ $t('flats.upTo._6') }}
+                    option(value="7") {{ $t('flats.upTo._7') }}
         .filter-item
-            span.label On page:
+            span.label {{ $t('flats.onPage') }}:
             span.filter
                 select.form-control(v-model="perPage")
                     option(value="20") 20
                     option(value="50") 50
                     option(value="100") 100
         .filter-item
-            button.btn.btn-outline-dark(type="button", @click="defaultFilters") Reset filters
+            button.btn.btn-outline-dark(type="button", @click="defaultFilters") {{ $t('flats.resetFilters') }}
 
     flats-list(:flats="showFlats", :order="order", :type="'flats'", @changeOrder="changeOrder")
 

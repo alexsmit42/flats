@@ -2,13 +2,13 @@
 .pagination-block
     ul.pagination.justify-content-center
         li.page-item(v-if="pageCount > 1", :class="{disabled: currentPage === 1}")
-            a.page-link(@click="goPage(currentPage - 1)") Previous
+            a.page-link(@click="goPage(currentPage - 1)") {{ $t('page.previous') }}
 
         li.page-item(v-for="page in pageCount", :class="{active: page === currentPage}")
             a.page-link(@click="goPage(page)") {{ page }}
 
         li.page-item(v-if="pageCount > 1", :class="{disabled: currentPage === pageCount}")
-            a.page-link(@click="goPage(currentPage + 1)") Next
+            a.page-link(@click="goPage(currentPage + 1)") {{ $t('page.next') }}
 </template>
 
 <script>

@@ -1,25 +1,38 @@
 <template lang="pug">
 #app
-    ul.menu-auth.nav.nav-pills.justify-content-center
-        template(v-if="isUser")
-            li.nav-item
-                a.nav-link(@click="logout", href="#") Logout
-        template(v-else)
-            li.nav-item
-                router-link(to="/login", class="nav-link") Login
-            li.nav-item
-                router-link(to="/registration", class="nav-link") Registration
+
+    .menu-user
+        .menu-lang
+            .lang-item(
+                v-for="locale in locales", 
+                :class="{'active': locale === currentLocale}", 
+                :title="$i18n.t(`menu.locale.${locale}`)",
+                @click="changeLocale(locale)"
+            )
+                img(:src="`assets/flags/${locale}.png`")
+
+        ul.menu-auth.nav.nav-pills.justify-content-center
+            template(v-if="user")
+                li.nav-item 
+                    a.nav-link {{ user.email }}
+                li.nav-item
+                    a.nav-link(@click="logout", href="#") {{ $t('auth.logout') }}
+            template(v-else)
+                li.nav-item
+                    router-link(to="/login", class="nav-link") {{ $t('auth.login') }}
+                li.nav-item
+                    router-link(to="/registration", class="nav-link") {{ $t('auth.registration') }}
         
 
     ul.menu.nav.nav-pills.justify-content-center(v-show="isShowMenu")
         li.nav-item
-            router-link(to="/flats", class="nav-link") Flats
+            router-link(to="/flats", class="nav-link") {{ $t('menu.flats') }}
         li.nav-item
-            router-link(to="/history", class="nav-link") History
-        li.nav-item(v-if="isUser")
-            router-link(to="/admin", class="nav-link") Admin
-        li.nav-item(v-if="isUser")
-            router-link(to="/favorites", class="nav-link") Favorites
+            router-link(to="/history", class="nav-link") {{ $t('menu.history') }}
+        li.nav-item(v-if="user")
+            router-link(to="/admin", class="nav-link") {{ $t('menu.admin') }}
+        li.nav-item(v-if="user")
+            router-link(to="/favorites", class="nav-link") {{ $t('menu.favorites') }}
     router-view
 </template>
 
@@ -31,28 +44,32 @@ export default {
     name: 'app',
     data () {
         return {
-      
+            locales: ['en', 'ru', 'pl']
         }
     },
     computed: {
+        currentLocale() {
+            return this.$i18n.locale
+        },
         isShowMenu() {
             if (this.$route.meta.noMenu) {
                 return false;
             }
             return true;
         },
-        isUser() {
-            if (Firebase.auth().currentUser) {
-                return true
-            }
-
-            return false
+        user() {
+            return Firebase.auth().currentUser
         }
     },
     methods: {
+        changeLocale(locale) {
+            if (locale !== this.currentLocale) {
+                this.$i18n.locale = locale
+            }
+        },
         logout() {
             Firebase.auth().signOut().then(() => {
-                this.$router.go()
+                this.$router.replace('flats');
             })
         }
     }
@@ -70,13 +87,41 @@ body {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    margin: 60px auto;
+    margin: 20px auto;
 
     max-width: 1500px;
 
-    .menu-auth {
-        margin: 0 auto 20px;
+    .menu-user {
+        display: flex;
+        margin: 40px auto;
+        max-width: 700px;
+        justify-content: space-around;
+
+        .menu-lang {
+            margin: 0 50px;
+            width: 150px;
+            display: flex;
+            justify-content: space-between;
+
+            .lang-item {
+                width: 40px;
+                height: 40px;
+                border: 4px solid lightgrey;
+                border-radius: 100%;
+                cursor: pointer;
+                opacity: 0.5;
+
+                &.active {
+                    opacity: 1;
+                }
+            }
+        }
+
+        .menu-auth {
+            margin: 0 50px;
+        }
     }
+
 
     .menu {
         margin-bottom: 20px;

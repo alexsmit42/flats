@@ -2,19 +2,20 @@
 .login-page
     ul.nav.nav-pills.justify-content-center
         li.nav-item
-            a.nav-link(@click="goBack", href="#") Back
-    h4 Login Page
+            a.nav-link(@click="goBack", href="#") {{ $t('back') }}
+
+    h4 {{ $t('auth.loginPage') }}
 
     .alert.alert-danger(v-show="errorMessage", role="alert") {{ errorMessage }}
 
     .form-group.row
-        label(for="email") Email
+        label(for="email") {{ $t('auth.email') }}
         input.form-control(type="email", id="email", v-model="email")
     .form-group.row
-        label(for="password") Password
+        label(for="password") {{ $t('auth.password') }}
         input.form-control(type="password", id="password", v-model="password")
     .form-group.row
-        button.btn.btn-primary(type="button", @click="login") Login
+        button.btn.btn-primary(type="button", @click="login") {{ $t('auth.login') }}
 
 </template>
 

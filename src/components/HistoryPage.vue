@@ -3,16 +3,16 @@
     .filter-chart(v-if="chartData.labels.length")
         .form-check.form-check-inline
             input.form-check-input(type="radio", id="avgChart", value="avg", v-model="chartField")
-            label.form-check-label(for="avgChart") Avg price
+            label.form-check-label(for="avgChart") {{ $t('flats.avgPrice') }}
         .form-check.form-check-inline
             input.form-check-input(type="radio", id="medianChart", value="median", v-model="chartField")
-            label.form-check-label(for="medianChart") Median price
+            label.form-check-label(for="medianChart") {{ $t('flats.medianPrice') }}
         .form-check.form-check-inline
             input.form-check-input(type="radio", id="oneRoomChart", value="oneRoom", v-model="chartField")
-            label.form-check-label(for="oneRoomChart") 1-room price
+            label.form-check-label(for="oneRoomChart") {{ $t('flats.oneRoomPrice') }}
         .form-check.form-check-inline
             input.form-check-input(type="radio", id="twoRoomChart", value="twoRoom", v-model="chartField")
-            label.form-check-label(for="twoRoomChart") 2-room price
+            label.form-check-label(for="twoRoomChart") {{ $t('flats.twoRoomPrice') }}
 
     .chart-block
         history-chart(v-if="chartData.labels.length", :chartData="chartData", :options="chartOptions")
@@ -20,13 +20,12 @@
     table.table.table-sm(v-if="showDays.length")
         thead
             tr
-                th Date
-                th Total flats
-                th Rooms
-                th Avg Price
-                th Median Price
-                th Avg Price/m
-                    sup 2
+                th {{ $t('flats.date') }}
+                th {{ $t('flats.totalFlats') }}
+                th {{ $t('flats.rooms') }}
+                th {{ $t('flats.avgPrice') }}, zł
+                th {{ $t('flats.medianPrice') }}, zł
+                th {{ $t('flats.avgMeter') }}/{{ $t('flats.m2') }}
         tbody
             tr(v-for="day, index in showDays")
                 td {{ day.date }}
@@ -41,20 +40,18 @@
                 td 
                     div 
                         span.value(:class="diffValue(index, 'avgPrice')") {{ day.avgPrice }} 
-                        span zł ( 
+                        span ( 
                         span 1:&nbsp; 
                         strong {{ day.rooms[1].avgPrice }} 
-                        span zł,&nbsp; 
+                        span &nbsp; 
                         span 2:&nbsp; 
                         strong {{ day.rooms[2].avgPrice }} 
-                        span zł)
+                        span )
                 td
                     div 
                         span.value(:class="diffValue(index, 'medianPrice')") {{ day.medianPrice }} 
                 td 
-                    span.value(:class="diffValue(index, 'avgMeter')") {{ day.avgMeter }} 
-                    span zł/m
-                        sup 2
+                    span.value(:class="diffValue(index, 'avgMeter')") {{ day.avgMeter }}
 </template>
 
 <script>
@@ -237,28 +234,27 @@ export default {
                 'oneRoom': [],
                 'twoRoom': []
             })
-            let title = 'Prices'
 
             this.chartValues = {
                 labels: labels,
                 datasets: {
                     'avg': {
-                        label: 'Avg price',
+                        label: this.$i18n.t('flats.avgPrice'),
                         borderColor: '#020263',
                         data: values.avg
                     },
                     'median': {
-                        label: 'Median price',
+                        label: this.$i18n.t('flats.medianPrice'),
                         borderColor: '#523c0f',
                         data: values.median
                     },
                     'oneRoom': {
-                        label: '1-room price',
+                        label: this.$i18n.t('flats.oneRoomPrice'),
                         borderColor: '#681212',
                         data: values.oneRoom
                     },
                     'twoRoom': {
-                        label: '2-room price',
+                        label: this.$i18n.t('flats.twoRoomPrice'),
                         borderColor: '#14380f',
                         data: values.twoRoom 
                     }
