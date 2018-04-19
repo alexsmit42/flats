@@ -4,7 +4,9 @@ let request = require('request-promise')
 let $ = {};
 
 let parser = {
-    getFlats: async (url) => {
+    getFlats: async (district) => {
+        let url = district.url
+
         let body = await request(url)
         $ = cheerio.load(body)
 
@@ -18,16 +20,17 @@ let parser = {
 
             let pageFlats = $('.mainBox').find('.row[data-id]')
             flats = [...flats, ...pageFlats.map((index, el) => {
-                return parser.getFlat($(el))
+                return parser.getFlat($(el), district._id)
             }).get()]
         }
 
         return flats
     },
-    getFlat: (flat) => {
+    getFlat: (flat, district) => {
         let photo = $('.photo img', flat).attr('data-original')
 
         let siteID = flat.attr('data-id')
+
         let title = $('section header h2.location', flat).text()
         let url = $('section header a.property_link', flat).attr('href')
         let price = $('section header .price div', flat).text()
@@ -37,8 +40,8 @@ let parser = {
         let rooms = parseInt($('b', params[0]).text())
         let area = parseInt($('b', params[1]).text())
 
-        return {siteID, title, url, photo, rooms, area, price}
-    } 
+        return {siteID, title, url, photo, rooms, area, price, district}
+    },
 }
 
 module.exports = parser

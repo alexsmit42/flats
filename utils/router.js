@@ -5,6 +5,7 @@ let logger = require('./logger')
 
 
 let api = require('./api')
+let currencyAPI = require('./currency')
 
 router.get('/parse', (req, res) => {
     api.parseFlats().then(flats => {
@@ -14,15 +15,19 @@ router.get('/parse', (req, res) => {
 })
 
 router.get('/days', (req, res) => {
-    api.getDays().then(days => {
+    let district = req.query.district || false;
+
+    api.getDays(district).then(days => {
         res.json({days})
     });
 })
 
 router.get('/flats', (req, res) => {
+    let district = req.query.district || false;
+
     (async() => {
         let lastDay = await api.getLastDay()
-        let flats = await api.getFlats(lastDay)
+        let flats = await api.getFlats(lastDay, district)
 
         res.json({lastDay, flats})
     })()
@@ -70,6 +75,41 @@ router.post('/excel', (req, res) => {
     if (api.saveExcel(flats)) {
         res.json({success: true})
     }
+})
+
+router.get('/districts', (req, res) => {
+    api.getDistricts().then(districts => {
+        res.json({districts})
+    })
+})
+
+router.post('/district', (req, res) => {
+    let title = req.body.title
+    let url = req.body.url
+
+    api.saveDistrict(title, url).then(district => {
+        if (district) {
+            api.parseFlats().then(flats => {
+                logger.info(`${flats.length} flats parsed after create district ${district.title}...`)
+            })
+
+            res.json({success: true})
+        } else {
+            res.json({success: false})
+        }
+    })
+})
+
+router.get('/districts/stat', (req, res) => {
+    api.getDistrictsStat().then(districts => {
+        res.json({districts})
+    })
+})
+
+router.get('/currency', (req, res) => {
+    currencyAPI.getCurrency().then(value => {
+        res.json({value})
+    })
 })
 
 module.exports = router;

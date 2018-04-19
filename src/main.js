@@ -23,7 +23,12 @@ const store = new Vuex.Store({
   state: {
     days: {},
     flats: [],
-    lastDay: ''
+    lastDay: '',
+    currencies: {
+      'PLN': 1,
+      'RUB': 1
+    },
+    currentCurrency: 'PLN'
   },
   mutations: {
     updateDays (state, days) {
@@ -32,6 +37,12 @@ const store = new Vuex.Store({
     updateFlats (state, data) {
       state.flats = data.flats
       state.lastDay = data.lastDay
+    },
+    updateCurrency (state, data) {
+      state.currencies[data.currency] = parseFloat(data.value)
+    },
+    updateCurrentCurrency (state, currency) {
+      state.currentCurrency = currency
     }
   }
 })

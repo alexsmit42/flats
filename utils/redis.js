@@ -60,6 +60,15 @@ let redisUtils = {
         }
 
         return true
+    },
+
+    saveCurrency: (ruble) => {
+        redisClient.set('RUB', ruble)
+    },
+
+    getCurrency: async() => {
+        let value = await redisClient.getAsync('RUB')
+        return value
     }
 }
 

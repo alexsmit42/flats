@@ -1,4 +1,5 @@
 module.exports = {
+    add: 'Добавить',
     app: 'Аренда квартир в Польше',
     back: 'Назад',
     saveExcel: 'Сохранить в Excel',
@@ -10,6 +11,18 @@ module.exports = {
         password: 'Пароль',
         registration: 'Регистрация',
         registrationPage: 'Регистрация'
+    },
+    currency: {
+        PLN: 'Польский злотый',
+        RUB: 'Русский рубль'
+    },
+    districts: {
+        add: 'Добавить район',
+        avgArea: 'Средняя площадь',
+        chooseDistrict: 'Выбрать район',
+        district: 'Район',
+        list: 'Районы',
+        url: 'URL'
     },
     favorites: {
         add: 'Добавить в избранное',
@@ -28,13 +41,13 @@ module.exports = {
         m: 'м',
         m2: 'м²',
         medianPrice: 'Медианная цена',
-        meter: 'Метры',
+        meter: 'Цена',
         onPage: 'На странице',
         oneRoomPrice: 'Цена за 1-ком.',
         oneRoom: '1-ком.',
         price: 'Цена',
         resetFilters: 'Сбросить фильтры',
-        rooms: 'Комнаты',
+        rooms: 'Число комнат',
         title: 'Заголовок',
         to: 'До',
         total: 'Всего',

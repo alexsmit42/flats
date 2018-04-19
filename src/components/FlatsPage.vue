@@ -2,6 +2,8 @@
 .flats-page
     h4 {{ day }}
 
+    district-change(@changeDistrict="changeDistrict")
+
     .total-line(v-if="total") {{ $t('flats.total') }}: {{ total }}
 
     .filter-block.form-inline(v-if="flats.length")
@@ -15,9 +17,9 @@
         .filter-item
             span.label {{ $t('flats.price') }}:
             span.filter
-                input.form-control(v-model="filters.minPrice", type="text", maxlength="5", :placeholder="$i18n.t('flats.from') + ' zł'") 
+                input.form-control(v-model="filters.minPrice", type="text", maxlength="5", :placeholder="$i18n.t('flats.from') + ' ' + getCurrencyMark()") 
                 span.separator -
-                input.form-control(v-model="filters.maxPrice", type="text", maxlength="5", :placeholder="$i18n.t('flats.to') + ' zł'")
+                input.form-control(v-model="filters.maxPrice", type="text", maxlength="5", :placeholder="$i18n.t('flats.to') + ' ' + getCurrencyMark()")
         .filter-item
             span.label {{ $t('flats.area') }}:
             span.filter
@@ -53,8 +55,11 @@
 
 <script>
 
+import CurrencyMixin from './mixins/CurrencyMixin'
+
 import axios from 'axios'
 
+import DistrictChange from './partial/DistrictChange.vue'
 import FlatsList from './partial/FlatsList.vue'
 import PaginationBlock from './partial/PaginationBlock.vue'
 
@@ -79,15 +84,26 @@ export default {
     },
     components: {
         FlatsList,
-        PaginationBlock
+        PaginationBlock,
+        DistrictChange
     },
+    mixins: [CurrencyMixin],
     created() {
         this.defaultFilters()
-        this.getFlats()
+        // this.getFlats()
     },
     computed: { 
         showFlats() {
-            let flats = this.filterFlats()
+            let flats = this.flats.map(flat => {
+                let newFlat = Object.assign({}, flat)
+
+                newFlat.price = this.getPrice(flat.price)
+                newFlat.meter = this.getPrice(flat.meter)
+
+                return newFlat
+            })
+
+            flats = this.filterFlats(flats)
             flats = this.sortBy(flats, this.order)
 
             this.pageCount = 0
@@ -114,9 +130,7 @@ export default {
 
             this.$forceUpdate()
         },
-        filterFlats() {
-            let flats = this.flats.slice(0)
-
+        filterFlats(flats) {
             for(let i in this.filters) {
                 if (this.filters[i]) {
                     this.filters[i] = parseInt(this.filters[i])
@@ -149,20 +163,20 @@ export default {
 
             return flats
         },
-        getFlats() {
-            if (Object.keys(this.$store.state.flats).length) {
-                this.flats = this.$store.state.flats
-                this.day = this.$store.state.lastDay
-                this.$forceUpdate
-            } else {
-                axios.get('/api/flats', {}).then(res => {
+        getFlats(district) {
+            // if (Object.keys(this.$store.state.flats).length) {
+            //     this.flats = this.$store.state.flats
+            //     this.day = this.$store.state.lastDay
+            //     this.$forceUpdate
+            // } else {
+                axios.get('/api/flats', {params: {district}}).then(res => {
                     this.day = res.data.lastDay
                     this.flats = res.data.flats
 
-                    this.$store.commit('updateFlats', res.data)
+                    // this.$store.commit('updateFlats', res.data)
                     this.$forceUpdate
                 })
-            }
+            // }
         },
         goPage(page) {
             this.page = page
@@ -200,6 +214,9 @@ export default {
                 field: 'title',
                 asc: true
             }
+        },
+        changeDistrict(district) {
+            this.getFlats(district)
         }
     }
 }

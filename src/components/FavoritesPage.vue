@@ -1,12 +1,15 @@
 <template lang="pug">
 .favorites-page
-    flats-list(:flats="favorites", :order="order", :type="'favorites'", @removeFavorite="removeFavorite")
+    flats-list(:flats="showFavorites", :order="order", :type="'favorites'", @removeFavorite="removeFavorite")
 </template>
 
 <script>
 import Firebase from 'firebase/app'
 import 'firebase/auth'
 import axios from 'axios'
+
+import CurrencyMixin from './mixins/CurrencyMixin'
+
 
 import FlatsList from './partial/FlatsList.vue'
 
@@ -24,8 +27,23 @@ export default {
         }
     },
     components: {FlatsList},
+    mixins: [CurrencyMixin],
     created() {
         this.getFavorites()
+    },
+    computed: {
+        showFavorites() {
+            let flats = this.favorites.map(flat => {
+                let newFlat = Object.assign({}, flat)
+
+                newFlat.price = this.getPrice(flat.price)
+                newFlat.meter = this.getPrice(flat.meter)
+
+                return newFlat
+            })
+
+            return flats
+        }
     },
     methods: {
         getFavorites() {

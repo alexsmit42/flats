@@ -10,6 +10,10 @@ let flatSchema = Schema({
     area: Number,
     price: Number,
     rooms: Number,
+    district: {
+        type: Schema.Types.ObjectId,
+        ref: 'District'
+    }
 });
 
 module.exports = mongoose.model('Flat', flatSchema);

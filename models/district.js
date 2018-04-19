@@ -7,11 +7,4 @@ let districtSchema = Schema({
     url: String
 });
 
-districtSchema.methods = {
-
-    verifyPassword: function(password) {
-        return password == this.password;
-    }
-};
-
 module.exports = mongoose.model('District', districtSchema);

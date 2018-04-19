@@ -8,7 +8,7 @@
             tr
                 th.title {{ $t('flats.title') }}
                 th.rooms {{ $t('flats.rooms') }}
-                th.order(@click="changeOrder('price')") {{ $t('flats.price') }}, zł
+                th.order(@click="changeOrder('price')") {{ $t('flats.price') }}, {{ getCurrencyMark() }}
                     span.direction
                         i.fa.fa-angle-up(v-if="order.field === 'price' && order.asc")
                         i.fa.fa-angle-down(v-if="order.field === 'price' && !order.asc")
@@ -17,7 +17,7 @@
                     span.direction
                         i.fa.fa-angle-up(v-if="order.field === 'area' && order.asc")
                         i.fa.fa-angle-down(v-if="order.field === 'area' && !order.asc")
-                th.order(@click="changeOrder('meter')") {{ $t('flats.meter') }}, zł/{{ $t('flats.m') }}
+                th.order(@click="changeOrder('meter')") {{ $t('flats.meter') }}, {{ getCurrencyMark()}}/{{ $t('flats.m') }}
                     sup 2
                     span.direction
                         i.fa.fa-angle-up(v-if="order.field === 'meter' && order.asc")
@@ -37,16 +37,17 @@
                     )
                     a(:href="flat.url", target="_blank") {{ flat.title }}
                 td {{ flat.rooms }}
-                td(:class="{ordered: order.field === 'price'}") {{ flat.price }} 
+                td(:class="{ordered: order.field === 'price'}") {{ flat.price | price  }} 
                 td(:class="{ordered: order.field === 'area'}") {{ flat.area }} 
-                td(:class="{ordered: order.field === 'meter'}") {{ flat.meter }} 
+                td(:class="{ordered: order.field === 'meter'}") {{ flat.meter | price }} 
                 td(:class="{ordered: order.field === 'days'}") {{ flat.days}}
                     span.price-change-warning(v-if="flat.uniquePrices.length > 1") ({{ $t('flats.changedPrice') }}!)  
 </template>
 
 <script>
 
-import { mapGetters } from 'vuex'
+import CurrencyMixin from '../mixins/CurrencyMixin'
+
 import Firebase from 'firebase/app'
 import 'firebase/auth'
 
@@ -61,6 +62,7 @@ export default {
             user: null
         }
     },
+    mixins: [CurrencyMixin],
     mounted() {
         this.getUser()
         this.getFavorites()
@@ -127,7 +129,7 @@ export default {
 
         th {
             &.rooms {
-                width: 100px;
+                width: 150px;
             }
 
             &.order {

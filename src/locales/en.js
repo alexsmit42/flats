@@ -1,4 +1,5 @@
 module.exports = {
+    add: 'Add',
     app: 'Polish flats app',
     back: 'Back',
     saveExcel: 'Save to Excel',
@@ -10,6 +11,18 @@ module.exports = {
         password: 'Password',
         registration: 'Registration',
         registrationPage: 'Registration page'
+    },
+    currency: {
+        PLN: 'Polish złoty',
+        RUB: 'Russian ruble'
+    },
+    districts: {
+        add: 'Add district',
+        avgArea: 'Avg area',
+        chooseDistrict: 'Choose district',
+        district: 'District',
+        list: 'Districts',
+        url: 'URL'
     },
     favorites: {
         add: 'Add to favorites',
@@ -28,13 +41,13 @@ module.exports = {
         m: 'm',
         m2: 'm²',
         medianPrice: 'Median price',
-        meter: 'Meter',
+        meter: 'Price',
         onPage: 'On page',
         oneRoomPrice: '1-room price',
         oneRoom: '1-room',
         price: 'Price',
         resetFilters: 'Reset filters',
-        rooms: 'Rooms',
+        rooms: 'Number of rooms',
         title: 'Title',
         to: 'To',
         total: 'Total',
@@ -53,6 +66,7 @@ module.exports = {
     },
     menu: {
         admin: 'Admin',
+        districts: 'Districts',
         favorites: 'Favorites',
         flats: 'Flats',
         history: 'History',

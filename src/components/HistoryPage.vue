@@ -1,5 +1,7 @@
 <template lang="pug">
 .history-page
+    district-change(@changeDistrict="changeDistrict")
+
     .filter-chart(v-if="chartData.labels.length")
         .form-check.form-check-inline
             input.form-check-input(type="radio", id="avgChart", value="avg", v-model="chartField")
@@ -23,8 +25,8 @@
                 th {{ $t('flats.date') }}
                 th {{ $t('flats.totalFlats') }}
                 th {{ $t('flats.rooms') }}
-                th {{ $t('flats.avgPrice') }}, zł
-                th {{ $t('flats.medianPrice') }}, zł
+                th {{ $t('flats.avgPrice') }}, {{ getCurrencyMark() }}
+                th {{ $t('flats.medianPrice') }}, {{ getCurrencyMark() }}
                 th {{ $t('flats.avgMeter') }}/{{ $t('flats.m2') }}
         tbody
             tr(v-for="day, index in showDays")
@@ -39,23 +41,26 @@
                         span.two-room {{ day.rooms[2].count }}
                 td 
                     div 
-                        span.value(:class="diffValue(index, 'avgPrice')") {{ day.avgPrice }} 
+                        span.value(:class="diffValue(index, 'avgPrice')") {{ day.avgPrice | price  }} 
                         span ( 
                         span 1:&nbsp; 
-                        strong {{ day.rooms[1].avgPrice }} 
+                        strong {{ day.rooms[1].avgPrice | price  }} 
                         span &nbsp; 
                         span 2:&nbsp; 
-                        strong {{ day.rooms[2].avgPrice }} 
+                        strong {{ day.rooms[2].avgPrice | price  }} 
                         span )
                 td
                     div 
-                        span.value(:class="diffValue(index, 'medianPrice')") {{ day.medianPrice }} 
+                        span.value(:class="diffValue(index, 'medianPrice')") {{ day.medianPrice | price  }} 
                 td 
-                    span.value(:class="diffValue(index, 'avgMeter')") {{ day.avgMeter }}
+                    span.value(:class="diffValue(index, 'avgMeter')") {{ day.avgMeter | price  }}
 </template>
 
 <script>
 
+import CurrencyMixin from './mixins/CurrencyMixin'
+
+import DistrictChange from './partial/DistrictChange.vue'
 import HistoryChart from './partial/HistoryChart.vue'
 
 import axios from 'axios'
@@ -79,10 +84,12 @@ export default {
         }
     },
     components: {
-        HistoryChart
+        HistoryChart,
+        DistrictChange
     },
+    mixins: [CurrencyMixin],
     created() {
-        this.getDays()
+        // this.getDays()
     },
     computed: {
         showDays() {
@@ -93,14 +100,16 @@ export default {
                 let flats = this.days[key];
 
                 let totals = flats.reduce((totals, flat) => {
+                    let currencyPrice = this.getPrice(flat.price)
+
                     totals.count++
-                    totals.price += flat.price
+                    totals.price += currencyPrice
                     totals.area += flat.area
-                    totals.meter += Math.round(flat.price / flat.area * 100) / 100
-                    totals.prices.push(flat.price)
+                    totals.meter += Math.round(currencyPrice / flat.area * 100) / 100
+                    totals.prices.push(currencyPrice)
 
                     totals.rooms[flat.rooms].count++
-                    totals.rooms[flat.rooms].price += flat.price
+                    totals.rooms[flat.rooms].price += currencyPrice
                     totals.rooms[flat.rooms].area += flat.area
 
                     return totals
@@ -128,6 +137,10 @@ export default {
 
                 let avgPrice = Math.round(totals.price / totals.count)
                 let avgMeter = Math.round(totals.meter / totals.count * 100) / 100
+                if (avgMeter > 100) {
+                    avgMeter = parseInt(avgMeter)
+                }
+
                 let medianPrice = this.getMedian(totals.prices)
                 
                 totals.rooms[1].avgPrice = Math.round(totals.rooms[1].price / totals.rooms[1].count)
@@ -143,9 +156,9 @@ export default {
                 }
             })
 
-            if (!this.chartValues.labels.length) {
+            // if (!this.chartValues.labels.length) {
                 this.generateChartData(showDays)
-            }
+            // }
 
             return showDays.reverse()
         },
@@ -166,7 +179,7 @@ export default {
                     }
 
                     return minMax
-                }, {min: 10000, max: 0});
+                }, {min: 100000, max: 0});
     
                 let diff = parseInt((max - min) / 5)
     
@@ -184,17 +197,17 @@ export default {
         }
     },
     methods: {
-        getDays() {
-            if (Object.keys(this.$store.state.days).length) {
-                this.days = this.$store.state.days
-                this.$forceUpdate
-            } else {
-                axios.get('/api/days', {}).then(res => {
+        getDays(district) {
+            // if (Object.keys(this.$store.state.days).length) {
+            //     this.days = this.$store.state.days
+            //     this.$forceUpdate
+            // } else {
+                axios.get('/api/days', {params: {district}}).then(res => {
                     this.days = res.data.days
                     this.$store.commit('updateDays', this.days)
                     this.$forceUpdate
                 })
-            }
+            // }
         },
         diffValue(index, value) {
             if (this.showDays[index + 1] !== undefined) {
@@ -265,6 +278,9 @@ export default {
                     }
                 }
             }
+        },
+        changeDistrict(district) {
+            this.getDays(district)
         }
     }
 }

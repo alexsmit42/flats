@@ -1,14 +1,34 @@
 let mongoose = require('./mongoose');
-let {Flat} = require('../models')
+let {Flat, District} = require('../models')
 let redis = require('./redis')
 
 let parser = require('./parser')
 
 let xlsx = require('xlsx')
 
+let getMedian = function(arr) {
+    arr = arr.sort()
+    let length = arr.length
+    let median = 0;
+    if (length % 2 === 0) {
+        let centerIndex = length / 2
+        median = (arr[centerIndex] + arr[centerIndex + 1]) / 2
+    } else {
+        let centerIndex = (length + 1) / 2
+        median = arr[centerIndex]
+    }
+
+    return Math.round(median * 10) / 10
+}
+
 let api = {
     parseFlats: async () => {
-        let flats = await parser.getFlats('https://www.morizon.pl/do-wynajecia/mieszkania/wroclaw/krzyki/?ps%5Bnumber_of_rooms_from%5D=1&ps%5Bnumber_of_rooms_to%5D=2')
+        let districts = await api.getDistricts()
+
+        let flats = await Promise.all(districts.map(district => {
+            return parser.getFlats(district)
+        }))
+        flats = [].concat.apply([], flats)
 
         return api.saveFlats(flats)
     },
@@ -45,7 +65,7 @@ let api = {
         })
     },
 
-    getDays: async () => {
+    getDays: async (district = false) => {
         let keys = await redis.getDaysKeys()
         let days = {};
 
@@ -65,7 +85,7 @@ let api = {
             return flatKeys
         }, {})
 
-        let flats = await api.getDBFlats(Object.keys(flatKeys))
+        let flats = await api.getDBFlats(Object.keys(flatKeys), district)
         
         await Promise.all(
             flats.map(async (flat) => {
@@ -103,8 +123,16 @@ let api = {
         return flat
     },
 
-    getDBFlats: async (flatIDs) => {
-        let flats = await Flat.find({siteID: {$in: flatIDs}})
+    getDBFlats: async (flatIDs, district) => {
+        let condition = {
+            siteID: {$in: flatIDs}
+        }
+
+        if (district) {
+            condition['district'] = district
+        }
+
+        let flats = await Flat.find(condition)
         return flats
     },
 
@@ -113,7 +141,7 @@ let api = {
         return lastDay
     },
 
-    getFlats: async (day) => {
+    getFlats: async (day, district = false) => {
         let keys = await redis.getDaysKeys(day)
 
         let flatKeys = keys.reduce( (flatKeys, key) => {
@@ -126,7 +154,7 @@ let api = {
             return flatKeys
         }, {})
 
-        let flats = await api.getDBFlats(Object.keys(flatKeys))
+        let flats = await api.getDBFlats(Object.keys(flatKeys), district)
 
         return await Promise.all(
             flats.map(async (flat) => {
@@ -153,7 +181,8 @@ let api = {
                     photo: flat.photo,
                     area: flat.area,
                     rooms: flat.rooms,
-                    siteID: flat.siteID
+                    siteID: flat.siteID,
+                    district: flat.district
                 }
             })
         )
@@ -208,6 +237,78 @@ let api = {
         xlsx.writeFile(wb, filename)
 
         return true
+    },
+
+    getDistricts() {
+        return District.find({})
+    },
+
+    saveDistrict(title, url) {
+        return District.create({
+            _id: new mongoose.Types.ObjectId(),
+            title,
+            url
+        })
+    },
+
+    getDistrictsStat: async() => {
+        let [districts, lastDay] = await Promise.all([api.getDistricts(), redis.getLastDay()]) 
+        let flats = await api.getFlats(lastDay)
+
+        let districtsStat = {}
+        flats.map(flat => {
+            let districtID = flat.district
+
+            if (districtsStat[districtID] === undefined) {
+                districtsStat[districtID] = {
+                    total: 0,
+                    prices: [],
+                    meter: 0,
+                    area: 0,
+                    rooms: {
+                        1: 0,
+                        2: 0
+                    }
+                }
+            }
+
+            districtsStat[districtID].total++;
+            districtsStat[districtID].meter += Math.round(flat.price / flat.area * 10) / 10;
+            districtsStat[districtID].rooms[flat.rooms]++;
+            districtsStat[districtID].prices.push(parseInt(flat.price));
+            districtsStat[districtID].area += flat.area;
+        })
+
+        districts = districts.map(district => {
+            let stat = districtsStat[district._id]
+
+            if (stat === undefined) {
+                return false
+            }
+            
+            let pricesSum = stat.prices.reduce((sum, price) => {
+                return sum + price
+            }, 0)
+
+            let avgPrice = Math.round(pricesSum / stat.total)
+            let avgMeter = Math.round(stat.meter / stat.total * 100) / 100
+            let avgArea = Math.round(stat.area / stat.total * 10) / 10
+            let medianPrice = getMedian(stat.prices)
+            
+            return {
+                _id: district._id,
+                title: district.title,
+                url: district.url,
+                avgPrice,
+                avgMeter,
+                avgArea,
+                medianPrice,
+                rooms: stat.rooms,
+                total: stat.total
+            }
+        })
+
+        return districts.filter(district => district)
     }
 }
 

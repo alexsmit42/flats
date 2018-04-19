@@ -14,6 +14,7 @@ import AdminPage from './components/AdminPage.vue'
 import FavoritesPage from './components/FavoritesPage.vue'
 import LoginPage from './components/LoginPage.vue'
 import RegistrationPage from './components/RegistrationPage.vue'
+import DistrictsPage from './components/DistrictsPage.vue'
 
 const routes = [
   {
@@ -24,6 +25,9 @@ const routes = [
   },
   {
     path: '/history', component: HistoryPage, name: 'history'
+  },
+  {
+    path: '/districts', component: DistrictsPage, name: 'districts'
   },
   {
     path: '/admin', component: AdminPage, name: 'admin', 
